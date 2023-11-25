@@ -25,6 +25,7 @@ Arduino core for ESP8266
  - [x] Send image via URL
  - [ ] Send image from internal flash / RAM via buffer pointer
  - [ ] Send image from external storage via File interface
+ - [x] Send map with maker
  - [ ] Support Ethernet module
 
 ## License

@@ -6,7 +6,7 @@
 # Classes and Structured Type (KEYWORD1)
 #######################################
 
-Notify  KEYWORD1
+LINE  KEYWORD1
 
 ###############################################
 # Methods and Functions (KEYWORD2)
@@ -23,3 +23,5 @@ send      KEYWORD2
 #######################################
 
 LINE_Notify_Massage_Option_t  KEYWORD3
+LONGDO_MAP  KEYWORD3
+GOOGLE_MAP  KEYWORD3

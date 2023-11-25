@@ -11,7 +11,7 @@ ArtronShop_LineNotify::ArtronShop_LineNotify() {
 
 }
 
-void ArtronShop_LineNotify::begin(String token, Client * client) {
+void ArtronShop_LineNotify::begin(String token, Client *client) {
     this->token = token;
     this->client = client;
 }
@@ -20,12 +20,8 @@ void ArtronShop_LineNotify::setToken(String token) {
     this->token = token;
 }
 
-void ArtronShop_LineNotify::setClient(Client * client) {
+void ArtronShop_LineNotify::setClient(Client *client) {
     this->client = client;
-}
-
-bool ArtronShop_LineNotify::send(String massage) {
-    return this->send(massage, NULL);
 }
 
 bool ArtronShop_LineNotify::send(String massage, LINE_Notify_Massage_Option_t *option) {
@@ -59,6 +55,33 @@ bool ArtronShop_LineNotify::send(String massage, LINE_Notify_Massage_Option_t *o
         if (option->image.url.length() > 0) {
             payload += "&imageFullsize=" + urlEncode(option->image.url);
         }
+        if (option->map.lat && option->map.lng) {
+            if (option->map.service == LONGDO_MAP) {
+                String map_url = "http://mmmap15.longdo.com/mmmap/snippet/index.php?width=2000&height=2000";
+                map_url += "&lat=" + String(option->map.lat, 9);
+                map_url += "&long=" + String(option->map.lng, 9);
+                map_url += "&zoom=" + String(option->map.zoom);
+                map_url += "&pinmark=" + option->map.noMaker ? '0' : '1';
+                if (option->map.option.length() > 0) {
+                    map_url += option->map.option;
+                }
+
+                payload += "&imageFullsize=" + urlEncode(map_url);
+            } else if (option->map.service == GOOGLE_MAP) {
+                String map_url = "https://maps.googleapis.com/maps/api/staticmap";
+                map_url += "?center=" + String(option->map.lat, 9) + "," + String(option->map.lng, 9);
+                map_url += "&markers=color:red%7Clabel:U%7C" + String(option->map.lat, 9) + "," + String(option->map.lng, 9);
+                map_url += "&zoom=" + String(option->map.zoom);
+                map_url += "&size=2000x2000";
+                map_url += "&format=jpg";
+                map_url += "&key=" + option->map.api_key;
+                if (option->map.option.length() > 0) {
+                    map_url += option->map.option;
+                }
+
+                payload += "&imageFullsize=" + urlEncode(map_url);
+            }
+        }
     }
 
     this->client->print("POST /api/notify HTTP/1.1\r\n");
@@ -70,8 +93,10 @@ bool ArtronShop_LineNotify::send(String massage, LINE_Notify_Massage_Option_t *o
     this->client->print("\r\n");
     this->client->print(payload);
 
-    long timeOut = millis() + 30000;
-    while(this->client->connected() && timeOut > millis()) {
+    delay(20); // wait server respond
+
+    long timeout = millis() + 30000;
+    while(this->client->connected() && timeout > millis()) {
         if (this->client->available()) {
             String str = this->client->readString();
             ESP_LOGI(TAG, "%s", str.c_str());
@@ -81,6 +106,8 @@ bool ArtronShop_LineNotify::send(String massage, LINE_Notify_Massage_Option_t *o
 
     return true;
 }
+
+ArtronShop_LineNotify LINE;
 
 // Code from https://github.com/plageoj/urlencode
 static String urlEncode(const char *msg) {

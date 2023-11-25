@@ -5,6 +5,11 @@
 #include <WiFi.h>
 #include "FS.h"
 
+typedef enum {
+    LONGDO_MAP,
+    GOOGLE_MAP
+} LINE_Notify_MAP_Service_t;
+
 typedef struct {
     // sticker
     struct {
@@ -19,33 +24,42 @@ typedef struct {
 
         // image from flash / RAM
         struct {
-            void * buffer = NULL;
+            void *buffer = NULL;
             size_t size = 0;
         } data;
 
         // image form external storage
         File file;
     } image;
+
+    // map
+    struct {
+        LINE_Notify_MAP_Service_t service = LONGDO_MAP;
+        float lat = 0;
+        float lng = 0;
+        int zoom = 7;
+        bool noMaker = false;
+        String api_key;
+        String option;
+    } map;
 } LINE_Notify_Massage_Option_t;
 
 
 class ArtronShop_LineNotify {
     private:
         String token = "";
-        Client * client = NULL;
+        Client *client = NULL;
  
     public:
         ArtronShop_LineNotify() ;
 
-        void begin(String token, Client * client = NULL) ;
+        void begin(String token = "", Client *client = NULL) ;
         void setToken(String token) ;
-        void setClient(Client * client) ;
-
-        bool send(String massage) ;
-        bool send(String massage, LINE_Notify_Massage_Option_t *option) ;
+        void setClient(Client *client) ;
+        bool send(String massage, LINE_Notify_Massage_Option_t *option = NULL) ;
 
 };
 
-extern ArtronShop_LineNotify Notify;
+extern ArtronShop_LineNotify LINE;
 
 #endif
