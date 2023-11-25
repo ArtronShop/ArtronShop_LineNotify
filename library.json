@@ -1,0 +1,18 @@
+{
+    "name": "ArtronShop_LineNotify",
+    "version": "1.0.0",
+    "keywords": "communication, esp32, esp8266, arduino",
+    "description": "LINE Notify library for ESP32 and ESP8266. Send notification message, sticker and images to LINE app",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/ArtronShop/ArtronShop_LineNotify.git"
+    },
+    "authors": [
+        {
+            "name": "Sonthaya Nongnuch",
+            "email": "sonthaya.nt@hotmail.com"
+        }
+    ],
+    "frameworks": "arduino",
+    "platforms": "espressif32, espressif8266"
+}
