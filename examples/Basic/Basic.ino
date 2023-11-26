@@ -3,15 +3,14 @@
 #include <WiFiMulti.h>
 #include <ArtronShop_LineNotify.h>
 
-#define WIFI_SSID ""
-#define WIFI_PASSWORD ""
+#define WIFI_SSID "wifi name" // WiFi Name
+#define WIFI_PASSWORD "wifi password" // WiFi Password
 
-#define LINE_TOKEN ""
+#define LINE_TOKEN "your LINE token" // LINE Token
 
 WiFiMulti wifiMulti;
 
 void setup() {
-
   Serial.begin(115200);
   // Serial.setDebugOutput(true);
 
@@ -29,8 +28,9 @@ void setup() {
   }
   Serial.println(" connected");
 
-  Notify.begin(LINE_TOKEN);
-  if (Notify.send("Hello from ESP32 !")) { // Send "Hello from ESP32 !" to LINE
+  LINE.begin(LINE_TOKEN);
+
+  if (LINE.send("Hello from ESP32 !")) { // Send "Hello from ESP32 !" to LINE
     Serial.println("Send notify successful");
   } else {
     Serial.println("Send notify fail. check your token");
