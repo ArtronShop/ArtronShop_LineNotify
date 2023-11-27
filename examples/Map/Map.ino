@@ -43,7 +43,7 @@ void setup() {
   if (LINE.send("Hello from ESP32 !", &option)) { // Send "Hello from ESP32 !" and asset to LINE
     Serial.println("Send notify successful");
   } else {
-    Serial.println("Send notify fail. check your token");
+    Serial.printf("Send notify fail. check your token (code: %d)\n", LINE.status_code);
   }
 }
 
