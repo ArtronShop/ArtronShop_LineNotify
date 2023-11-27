@@ -53,32 +53,40 @@ bool ArtronShop_LineNotify::send(String massage, LINE_Notify_Massage_Option_t *o
             payload += "&stickerId=" + String(option->sticker.id);
         }
         if (option->image.url.length() > 0) {
+            payload += "&imageThumbnail=" + urlEncode(option->image.url);
             payload += "&imageFullsize=" + urlEncode(option->image.url);
         }
         if (option->map.lat && option->map.lng) {
             if (option->map.service == LONGDO_MAP) {
-                String map_url = "http://mmmap15.longdo.com/mmmap/snippet/index.php?width=2000&height=2000";
+                String map_url = "https://mmmap15.longdo.com/mmmap/snippet/index.php?width=1000&height=1000";
                 map_url += "&lat=" + String(option->map.lat, 9);
                 map_url += "&long=" + String(option->map.lng, 9);
                 map_url += "&zoom=" + String(option->map.zoom);
-                map_url += "&pinmark=" + option->map.noMaker ? '0' : '1';
+                map_url += "&pinmark=" + String(option->map.noMaker ? '0' : '1');
                 if (option->map.option.length() > 0) {
-                    map_url += option->map.option;
+                    map_url += "&" + option->map.option;
                 }
+                map_url += "&HD=1";
 
+                ESP_LOGI(TAG, "Map image URL: %s", map_url.c_str());
+
+                payload += "&imageThumbnail=" + urlEncode(map_url);
                 payload += "&imageFullsize=" + urlEncode(map_url);
             } else if (option->map.service == GOOGLE_MAP) {
                 String map_url = "https://maps.googleapis.com/maps/api/staticmap";
                 map_url += "?center=" + String(option->map.lat, 9) + "," + String(option->map.lng, 9);
                 map_url += "&markers=color:red%7Clabel:U%7C" + String(option->map.lat, 9) + "," + String(option->map.lng, 9);
                 map_url += "&zoom=" + String(option->map.zoom);
-                map_url += "&size=2000x2000";
+                map_url += "&size=1000x1000";
                 map_url += "&format=jpg";
                 map_url += "&key=" + option->map.api_key;
                 if (option->map.option.length() > 0) {
-                    map_url += option->map.option;
+                    map_url += "&" + option->map.option;
                 }
 
+                ESP_LOGI(TAG, "Map image URL: %s", map_url.c_str());
+
+                payload += "&imageThumbnail=" + urlEncode(map_url);
                 payload += "&imageFullsize=" + urlEncode(map_url);
             }
         }
@@ -96,15 +104,48 @@ bool ArtronShop_LineNotify::send(String massage, LINE_Notify_Massage_Option_t *o
     delay(20); // wait server respond
 
     long timeout = millis() + 30000;
-    while(this->client->connected() && timeout > millis()) {
+    bool first_line = true;
+    int state = 0;
+    while(this->client->connected() && (timeout > millis())) {
         if (this->client->available()) {
-            String str = this->client->readString();
-            ESP_LOGI(TAG, "%s", str.c_str());
+            if (state == 0) { // Header
+                String line = this->client->readStringUntil('\n');
+                if (line.endsWith("\r")) {
+                    line = line.substring(0, line.length() - 1);
+                }
+                ESP_LOGI(TAG, "Header: %s", line.c_str());
+                if (first_line) {
+                    if (sscanf(line.c_str(), "HTTP/%*f %d", &this->status_code) >= 1) {
+                        first_line = false;
+                    } else {
+                        ESP_LOGE(TAG, "invalid first line");
+                    }
+                } else {
+                    // Header
+                    if (line.length() == 0) {
+                        state = 2;
+                    }
+                }
+            } else if (state == 2) { // Data
+                String line = this->client->readStringUntil('\n');
+                if (line.endsWith("\r")) {
+                    line = line.substring(0, line.length() - 1);
+                }
+                ESP_LOGI(TAG, "Data: %s", line.c_str());
+                if (line.length() == 0) {
+                    break;
+                }
+            }
         }
         delay(10);
     }
+    ESP_LOGI(TAG, "END");
+    
+    this->client->stop();
+    delete this->client;
+    this->client = NULL;
 
-    return true;
+    return this->status_code == 200;
 }
 
 ArtronShop_LineNotify LINE;

@@ -37,7 +37,7 @@ typedef struct {
         LINE_Notify_MAP_Service_t service = LONGDO_MAP;
         float lat = 0;
         float lng = 0;
-        int zoom = 7;
+        int zoom = 20;
         bool noMaker = false;
         String api_key;
         String option;
@@ -51,6 +51,8 @@ class ArtronShop_LineNotify {
         Client *client = NULL;
  
     public:
+        int status_code = 0;
+        
         ArtronShop_LineNotify() ;
 
         void begin(String token = "", Client *client = NULL) ;

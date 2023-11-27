@@ -35,9 +35,9 @@ void setup() {
   // Map
   option.map.service = LONGDO_MAP; // Longdo Map
   // option.map.service = GOOGLE_MAP; // Google Map
-  option.map.lat = 13.910216086303118;
-  option.map.lng = 100.51109150490085;
-  option.map.zoom = 12;
+  option.map.lat = 13.910216086303118; // Latitude 
+  option.map.lng = 100.51109150490085; // Longitude
+  option.map.zoom = 20; // 1 - 20
   // option.map.api_key = "Google Map API Key"; // needs if use Google Map service
 
   if (LINE.send("Hello from ESP32 !", &option)) { // Send "Hello from ESP32 !" and asset to LINE
