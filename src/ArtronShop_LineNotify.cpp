@@ -30,7 +30,7 @@ bool ArtronShop_LineNotify::send(String massage, LINE_Notify_Massage_Option_t *o
         return false;
     }
 
-    bool imageUpload = (option->image.data.buffer) && (option->image.data.size > 0);
+    bool imageUpload = false;
 
     // TODO: use user client for Ethernet support
     if (!this->client) {
@@ -90,6 +90,7 @@ bool ArtronShop_LineNotify::send(String massage, LINE_Notify_Massage_Option_t *o
                 payload += "&imageFullsize=" + urlEncode(map_url);
             }
         }
+        imageUpload = (option->image.data.buffer) && (option->image.data.size > 0);
     }
 
     this->client->print("POST /api/notify HTTP/1.1\r\n");
