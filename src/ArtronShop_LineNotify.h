@@ -2,8 +2,12 @@
 #define __ARTRONSHOP_LINE_NOTIFY__
 
 #include <Arduino.h>
+#ifdef ARDUINO_UNOWIFIR4
+#include <WiFiS3.h>
+#else
 #include <WiFi.h>
 #include "FS.h"
+#endif
 
 typedef enum {
     LONGDO_MAP,
@@ -29,7 +33,9 @@ typedef struct {
         } data;
 
         // image form external storage
+#ifndef ARDUINO_UNOWIFIR4
         File file;
+#endif
     } image;
 
     // map

@@ -18,6 +18,10 @@ Arduino core for ESP8266
  - [x] ESP8266 (not test yet)
  - [x] ESP8285 (not test yet)
 
+Others board with WiFi connect
+
+ - [x] Arduino Uno R4 WiFi / i-Duino R4
+
 ## Features
 
  - [x] Send message

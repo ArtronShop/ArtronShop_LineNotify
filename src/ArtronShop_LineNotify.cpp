@@ -1,6 +1,15 @@
 #include "ArtronShop_LineNotify.h"
 #include "LINE_Notify_CA.h"
+#ifdef ARDUINO_UNOWIFIR4
+#include <WiFiSSLClient.h>
+#else
 #include <WiFiClientSecure.h>
+#endif
+
+#ifdef ARDUINO_UNOWIFIR4
+#define ESP_LOGI(...) ;
+#define ESP_LOGE(...) ;
+#endif
 
 static const char * TAG = "LINE-Notify";
 
@@ -34,9 +43,13 @@ bool ArtronShop_LineNotify::send(String massage, LINE_Notify_Massage_Option_t *o
 
     // TODO: use user client for Ethernet support
     if (!this->client) {
+#ifdef ARDUINO_UNOWIFIR4
+        this->client = new WiFiSSLClient();
+#else
         this->client = new WiFiClientSecure();
         // ((WiFiClientSecure *) this->client)->setInsecure(); 
         ((WiFiClientSecure *) this->client)->setCACert(LINE_Notify_CA);
+#endif
     }
 
     int ret = this->client->connect("notify-api.line.me", 443);
@@ -95,10 +108,10 @@ bool ArtronShop_LineNotify::send(String massage, LINE_Notify_Massage_Option_t *o
 
     this->client->print("POST /api/notify HTTP/1.1\r\n");
     this->client->print("Host: notify-api.line.me\r\n");
-    this->client->printf("Authorization: Bearer %s\r\n", this->token.c_str());
+    this->client->print("Authorization: Bearer " + this->token + "\r\n");
     this->client->print("User-Agent: ESP32\r\n");
     this->client->print("Content-Type: application/x-www-form-urlencoded\r\n");
-    this->client->printf("Content-Length: %d\r\n", payload.length());
+    this->client->print("Content-Length: " + String(payload.length()) + "\r\n");
     this->client->print("\r\n");
     this->client->print(payload);
 
